@@ -1,54 +1,39 @@
-!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Amazon Product Formatter</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-    }
-    input, button {
-      margin-top: 10px;
-      padding: 8px;
-      width: 300px;
-      font-size: 16px;
-    }
-    .output {
-      margin-top: 30px;
-      white-space: pre-line;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paletiki</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <h1>Paletiki Generator</h1>
+  <input type="text" id="name" placeholder="Amazon Name"><br>
+  <input type="number" id="price" placeholder="Price ($)"><br>
+  <button onclick="generate()">Generate</button>
 
-  <h2>Amazon Product Formatter</h2>
-
-  <input type="text" id="productName" placeholder="Amazon Name">
-  <br>
-  <input type="number" id="productPrice" placeholder="Price">
-  <br>
-  <button onclick="formatProduct()">Submit</button>
-
-  <div class="output" id="output"></div>
+  <div class="output" id="output" style="display:none;"></div>
 
   <script>
-    function formatProduct() {
-      const name = document.getElementById("productName").value;
-      const price = document.getElementById("productPrice").value;
+    function generate() {
+      let name = document.getElementById("name").value;
+      let price = document.getElementById("price").value;
+      if (name.length > 80) {
+        name = name.substring(0, 80);
+      }
 
-      // Ограничение на 80 символов
-      const shortName = name.length > 80 ? name.substring(0, 80) : name;
+      const output = `
+        <h2>name:</h2>
+        <p>${name}</p>
+        <h2>descript:</h2>
+        <p>${name}</p>
+        <p>Retail Price - $${price} + TAX</p>
+        <p>Like New<br>Full Set<br>Good Idea For Gift</p>
+      `;
 
-      const outputText = 
-        "name:\n\n" + shortName + "\n\n\n" +
-        "descript:\n\n" + name + "\n\n" +
-        "Retail Price - $" + price + " + TAX\n\n" +
-        "Like New \nFull Set \nGood Idea For Gift";
-
-      document.getElementById("output").textContent = outputText;
+      document.getElementById("output").innerHTML = output;
+      document.getElementById("output").style.display = "block";
     }
   </script>
-
 </body>
 </html>
