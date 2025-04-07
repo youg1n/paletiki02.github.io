@@ -3,37 +3,345 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Paletiki</title>
+  <title>Paletiki Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 3%; /* отступ сверху 3% */
+      padding-bottom: 2%; /* отступ снизу 2% */
+    }
+
+    .container {
+      display: flex;
+      gap: 30px;
+      width: 95vw; /* 95% от ширины экрана */
+      height: 95vh; /* 95% от высоты экрана */
+      justify-content: space-between;
+      overflow: auto; /* добавляем прокрутку, если контейнер не помещается */
+    }
+
+    .form-section, .history-section {
+      width: 80%; /* Блоки занимают 80% ширины контейнера */
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      height: 100%;
+      overflow-y: auto; /* Прокрутка внутри этих секций, если нужно */
+    }
+
+    h1 {
+      color: #75B0D1;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #75B0D1;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #5f9db6;
+    }
+
+    .output {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      width: 100%;
+      display: none;
+    }
+
+    .output h2 {
+      color: #75B0D1;
+    }
+
+    .condition {
+      margin-top: 20px;
+      white-space: pre-wrap; /* Сохранение переноса строк */
+    }
+
+    .condition .condition-title {
+      font-weight: bold;
+    }
+
+    .saved-block {
+      background-color: #f3f3f3;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .saved-block p {
+      margin: 8px 0;
+    }
+
+    .saved-block hr {
+      margin-top: 10px;
+      border: 0;
+      border-top: 1px solid #ddd;
+    }
+
+    .copy-btn {
+      background-color: #75B0D1;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-top: 5px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .copy-btn:hover {
+      background-color: #5f9db6;
+    }
+
+    /* Медиазапрос для мобильных устройств */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .form-section, .history-section {
+        width: 100%; /* На мобильных устройствах секции занимают всю ширину */
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Paletiki Generator</h1>
-  <input type="text" id="name" placeholder="Amazon Name"><br>
-  <input type="number" id="price" placeholder="Price ($)"><br>
-  <button onclick="generate()">Generate</button>
+  <div class="container">
+    <!-- Form Section -->
+    <div class="form-section">
+      <h1>Paletiki Generator</h1>
+      <input type="text" id="name" placeholder="Amazon Name (Max 79 characters)" maxlength="79" />
+      <button class="copy-btn" onclick="copyText('name')">Copy Name</button>
 
-  <div class="output" id="output" style="display:none;"></div>
+      <input type="number" id="price" placeholder="Price ($)" />
+      <button class="copy-btn" onclick="copyText('price')">Copy Price</button>
+
+      <label for="condition">Condition:</label>
+      <select id="condition">
+        <option value="0">Practically New</option>
+        <option value="1">Slightly Used, Good Condition</option>
+        <option value="2">Medium Condition</option>
+        <option value="3">Incomplete Set, Some Parts Missing</option>
+        <option value="4">Well Used, Slight Wear</option>
+        <option value="5">Heavily Used, Functional Only</option>
+        <option value="6">Partially Broken, For Parts</option>
+        <option value="7">Vintage, Rare, Some Wear</option>
+        <option value="8">New Old Stock, Unopened</option>
+        <option value="9">Used, Excellent for Repurposing</option>
+      </select>
+
+      <div id="conditionDescription">Condition: Practically New</div>
+
+      <button onclick="generate()">Generate</button>
+      <button onclick="save()">Save</button>
+      <button onclick="clearAll()">Clear All Saved Items</button>
+
+      <div class="output" id="output" style="display:none;">
+        <h2>Name:</h2>
+        <p id="output-name"></p>
+        <button class="copy-btn" onclick="copyText('output-name')">Copy Name</button>
+
+        <h2>Description:</h2>
+        <p id="output-description"></p>
+        <button class="copy-btn" onclick="copyText('output-description')">Copy Description</button>
+
+        <h2>Price:</h2>
+        <p id="output-price"></p>
+        <button class="copy-btn" onclick="copyText('output-price')">Copy Price</button>
+
+        <div class="condition">
+          <div class="condition-title">Condition:</div>
+          <p id="output-condition"></p>
+        </div>
+
+        <!-- Кнопка для копирования всего описания, без имени -->
+        <button class="copy-btn" onclick="copyFullDescription()">Copy Full Description</button>
+      </div>
+    </div>
+
+    <!-- Saved Items Section -->
+    <div class="history-section" id="history">
+      <h2>Saved</h2>
+      <div id="savedItems"></div>
+    </div>
+  </div>
 
   <script>
+    document.getElementById('condition').addEventListener('change', function() {
+      const conditionText = [
+        'Practically New',
+        'Slightly Used, Good Condition',
+        'Medium Condition',
+        'Incomplete Set, Some Parts Missing',
+        'Well Used, Slight Wear',
+        'Heavily Used, Functional Only',
+        'Partially Broken, For Parts',
+        'Vintage, Rare, Some Wear',
+        'New Old Stock, Unopened',
+        'Used, Excellent for Repurposing'
+      ];
+      const conditionValue = this.value;
+      document.getElementById('conditionDescription').innerText = `Condition: ${conditionText[conditionValue]}`;
+    });
+
     function generate() {
       let name = document.getElementById("name").value;
       let price = document.getElementById("price").value;
-      if (name.length > 80) {
-        name1 = name.substring(0, 80);
-      }
 
-      const output = `
-        <h2>name:</h2>
-        <p>${name1}</p>
-        <h2>descript:</h2>
-        <p>${name}</p>
-        <p>Retail Price - $${price} + TAX</p>
-        <p>🟩Like New<br>🟩Full Set<br>🟩Good Idea For Gift</p>
-      `;
+      const condition = document.getElementById('condition').value;
+      const conditionText = [
+        'Practically New',
+        'Slightly Used, Good Condition',
+        'Medium Condition',
+        'Incomplete Set, Some Parts Missing',
+        'Well Used, Slight Wear',
+        'Heavily Used, Functional Only',
+        'Partially Broken, For Parts',
+        'Vintage, Rare, Some Wear',
+        'New Old Stock, Unopened',
+        'Used, Excellent for Repurposing'
+      ];
 
-      document.getElementById("output").innerHTML = output;
+      const conditionDescription = [
+        'Brand New, Full Set, Great for Gifting',
+        'Almost New, Complete, Excellent for Daily Use',
+        'Good Condition, May Have Minor Wear, Still Functional',
+        'Missing Parts, Not Complete, Great for Parts or DIY Projects',
+        'Used, But in Good Shape, Just Slight Wear',
+        'Heavily Used, Still Works, Good for Repair or Parts',
+        'Partially Broken, But Could Be Used for Parts',
+        'Vintage Item, Rare and Collectible, Shows Some Wear',
+        'Brand New, Old Stock, Unopened Packaging',
+        'Used, In Excellent Condition for Repurposing or Upcycling'
+      ];
+
+      document.getElementById('output-name').innerText = name;
+      document.getElementById('output-description').innerText = name;
+      document.getElementById('output-price').innerText = `Retail price is - $${price} + TAX`;
+      document.getElementById('output-condition').innerText = `${conditionText[condition]} - ${conditionDescription[condition]}`;
+
       document.getElementById("output").style.display = "block";
     }
+
+    function save() {
+      let name = document.getElementById("name").value;
+      let price = document.getElementById("price").value;
+
+      const condition = document.getElementById('condition').value;
+      const conditionText = [
+        'Practically New',
+        'Slightly Used, Good Condition',
+        'Medium Condition',
+        'Incomplete Set, Some Parts Missing',
+        'Well Used, Slight Wear',
+        'Heavily Used, Functional Only',
+        'Partially Broken, For Parts',
+        'Vintage, Rare, Some Wear',
+        'New Old Stock, Unopened',
+        'Used, Excellent for Repurposing'
+      ];
+
+      const conditionDescription = [
+        'Brand New, Full Set, Great for Gifting',
+        'Almost New, Complete, Excellent for Daily Use',
+        'Good Condition, May Have Minor Wear, Still Functional',
+        'Missing Parts, Not Complete, Great for Parts or DIY Projects',
+        'Used, But in Good Shape, Just Slight Wear',
+        'Heavily Used, Still Works, Good for Repair or Parts',
+        'Partially Broken, But Could Be Used for Parts',
+        'Vintage Item, Rare and Collectible, Shows Some Wear',
+        'Brand New, Old Stock, Unopened Packaging',
+        'Used, In Excellent Condition for Repurposing or Upcycling'
+      ];
+
+      const item = {
+        name: name,
+        price: price,
+        condition: conditionText[condition],
+        conditionDetails: conditionDescription[condition]
+      };
+
+      let saved = JSON.parse(localStorage.getItem("paletikiData")) || [];
+      saved.push(item);
+      localStorage.setItem("paletikiData", JSON.stringify(saved));
+      renderSaved();
+      document.getElementById("output").style.display = "none";
+      document.getElementById("name").value = "";
+      document.getElementById("price").value = "";
+      document.getElementById("condition").value = "0";
+    }
+
+    function renderSaved() {
+      const container = document.getElementById("savedItems");
+      const saved = JSON.parse(localStorage.getItem("paletikiData")) || [];
+      container.innerHTML = "";
+      saved.slice().reverse().forEach(item => {
+        const block = document.createElement("div");
+        block.className = "saved-block";
+        block.innerHTML = `
+          <p><strong>Name:</strong> ${item.name}</p>
+          <p><strong>Description:</strong> ${item.name}</p>
+          <p><strong>Retail price is - $${item.price} + TAX</strong></p>
+          <p><strong>Condition:</strong> ${item.condition}</p>
+          <p>${item.conditionDetails}</p>
+          <hr />
+        `;
+        container.appendChild(block);
+      });
+    }
+
+    function clearAll() {
+      localStorage.removeItem("paletikiData");
+      renderSaved();
+    }
+
+    function copyText(elementId) {
+      const textToCopy = document.getElementById(elementId).innerText || document.getElementById(elementId).value;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        alert(`Copied: ${textToCopy}`);
+      });
+    }
+
+    function copyFullDescription() {
+      const fullDescription = `
+        Description: ${document.getElementById('output-description').innerText}
+        Price: ${document.getElementById('output-price').innerText}
+        Condition: ${document.getElementById('output-condition').innerText}
+      `;
+      navigator.clipboard.writeText(fullDescription).then(() => {
+        alert(`Copied Full Description: ${fullDescription}`);
+      });
+    }
+
+    renderSaved();
   </script>
 </body>
 </html>
