@@ -18,24 +18,26 @@
       min-height: 100vh;
       padding-top: 3%; /* отступ сверху 3% */
       padding-bottom: 2%; /* отступ снизу 2% */
+      color: #333; /* Цвет текста для улучшения контраста */
     }
 
     .container {
       display: flex;
       gap: 30px;
       width: 95vw; /* 95% от ширины экрана */
-      height: 95vh; /* 95% от высоты экрана */
+      height: auto; /* Высота адаптирована под контент */
       justify-content: space-between;
       overflow: auto; /* добавляем прокрутку, если контейнер не помещается */
+      flex-wrap: wrap; /* Позволяет контейнерам на мобильных устройствах быть в разных строках */
     }
 
     .form-section, .history-section {
-      width: 80%; /* Блоки занимают 80% ширины контейнера */
+      width: 48%; /* Блоки занимают 48% ширины контейнера на больших экранах */
       background-color: #fff;
       padding: 30px;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      height: 100%;
+      height: auto; /* Высота подстраивается под контент */
       overflow-y: auto; /* Прокрутка внутри этих секций, если нужно */
     }
 
@@ -129,6 +131,23 @@
 
       .form-section, .history-section {
         width: 100%; /* На мобильных устройствах секции занимают всю ширину */
+      }
+
+      /* Уменьшаем отступы внутри элементов */
+      .saved-block {
+        margin: 10px 0;
+      }
+
+      .output {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 20px; /* Уменьшаем размер заголовка на мобильных устройствах */
+      }
+
+      input, select, button {
+        font-size: 14px; /* Уменьшаем шрифт для лучшего восприятия на маленьких экранах */
       }
     }
   </style>
